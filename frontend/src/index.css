@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/*
+ * BME brand tokens, taken from the official bme.hu stylesheet
+ * (themes/custom/bme_bootstrap). Keep these in sync with the university site.
+ */
+@theme {
+  --color-bme-red: #931634;
+  --color-bme-red-dark: #76122a;
+  --color-bme-red-50: #f9eef1;
+  --color-ink: #262626;
+  --color-ink-soft: #5c5c5c;
+  --color-line: #e6e9eb;
+  --color-paper: #f1f1f1;
+
+  --font-sans: "Noto Sans", system-ui, sans-serif;
+  --font-serif: "Noto Serif", Georgia, serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-bme-red;
+  }
+}
