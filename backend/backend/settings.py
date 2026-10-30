@@ -100,7 +100,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get(
-            'DATABASE_URL', 'postgresql://mybme:mybme_dev_password@localhost:5433/mybme'
+            'DATABASE_URL', 'postgresql://myBME_user:myBME-password@localhost:5432/myBME_db'
         ),
         conn_max_age=600,
     )
