@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME:-mybme}
+      POSTGRES_USER: ${DB_USER:-mybme}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mybme_dev_password}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
