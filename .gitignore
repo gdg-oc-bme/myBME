@@ -1,1 +1,24 @@
-.DS_STORE
+# environment
+.env
+
+# python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+
+# django
+backend/db.sqlite3
+backend/staticfiles/
+backend/media/
+
+# node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# editor / os
+.DS_Store
+.vscode/
+.idea/
