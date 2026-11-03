@@ -1,20 +1,15 @@
 const styles = {
-  open: 'bg-green-50 text-green-800 ring-green-600/20',
-  closed: 'bg-paper text-ink-soft ring-ink/10',
-  unknown: 'bg-amber-50 text-amber-800 ring-amber-600/20',
-}
-
-const labels = {
-  open: 'Open now',
-  closed: 'Closed',
-  unknown: 'Check hours',
+  open: { dot: 'bg-green-600', text: 'text-green-800', label: 'Open now' },
+  closed: { dot: 'bg-ink/25', text: 'text-ink-soft', label: 'Closed' },
+  unknown: { dot: 'bg-amber-500', text: 'text-amber-800', label: 'Check hours' },
 }
 
 export default function StatusBadge({ status }) {
+  const s = styles[status]
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${styles[status]}`}>
-      {status === 'open' && <span className="size-1.5 rounded-full bg-green-600" aria-hidden="true" />}
-      {labels[status]}
+    <span className={`inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap ${s.text}`}>
+      <span className={`size-2 rounded-full ${s.dot}`} aria-hidden="true" />
+      {s.label}
     </span>
   )
 }

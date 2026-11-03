@@ -7,7 +7,8 @@ import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 
 function RequireLogin({ children }) {
-  const { user } = useAuth()
+  const { status, user } = useAuth()
+  if (status === 'loading') return <p className="mx-auto max-w-6xl px-4 py-16 text-ink-soft">Loading…</p>
   return user ? children : <Navigate to="/login" replace />
 }
 
@@ -19,6 +20,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          {/* The backend redirects here after a successful eduID login (issues #11/#12). */}
           <Route
             path="/dashboard"
             element={

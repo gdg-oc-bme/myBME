@@ -23,7 +23,7 @@
   }
 
   body {
-    @apply bg-paper text-ink font-sans antialiased;
+    @apply bg-white text-ink font-sans antialiased;
   }
 
   :focus-visible {

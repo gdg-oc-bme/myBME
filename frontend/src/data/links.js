@@ -1,5 +1,6 @@
 // Official BME web services. Every URL here was checked against the live
 // site (October 2026). Keep this list to official sources only.
+// Hard-coded for now: these will move to their own table in the backend.
 export const quickLinks = [
   {
     id: 'neptun',
