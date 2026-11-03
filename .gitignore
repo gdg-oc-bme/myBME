@@ -13,6 +13,9 @@ backend/db.sqlite3
 backend/staticfiles/
 backend/media/
 
+# SAML SP keypair — generate locally, never commit (see accounts/saml_config.py)
+backend/accounts/certs/
+
 # node / frontend
 frontend/node_modules/
 frontend/dist/

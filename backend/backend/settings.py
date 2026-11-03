@@ -47,13 +47,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'djangosaml2',
     'api',
+    'accounts',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'djangosaml2.middleware.SamlSessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -162,4 +165,29 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+}
+
+
+# SAML login via BME's eduID (Shibboleth) IdP — see accounts/saml_config.py
+# https://github.com/IdentityPython/djangosaml2
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'djangosaml2.backends.Saml2Backend',
+)
+
+LOGIN_URL = '/saml2/login/'
+
+from accounts.saml_config import SAML_CONFIG  # noqa: E402
+
+SAML_CREATE_UNKNOWN_USER = True
+SAML_DJANGO_USER_MAIN_ATTRIBUTE = 'username'
+SAML_DJANGO_USER_MAIN_ATTRIBUTE_LOOKUP = '__exact'
+# Attribute names are a best guess pending BME's actual attribute-release
+# policy for this SP (known only once registered with BME's identity team).
+SAML_ATTRIBUTE_MAPPING = {
+    'eduPersonPrincipalName': ('username',),
+    'mail': ('email',),
+    'givenName': ('first_name',),
+    'sn': ('last_name',),
 }
