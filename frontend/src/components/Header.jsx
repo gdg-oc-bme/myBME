@@ -16,7 +16,7 @@ export default function Header() {
           <span className="text-bme-red">my</span>BME
         </Link>
 
-        <nav aria-label="Main" className="flex items-center gap-1 sm:gap-2">
+        <nav aria-label="Main" className="hidden items-center gap-2 sm:flex">
           <NavLink to="/" end className={navClass}>
             Campus
           </NavLink>

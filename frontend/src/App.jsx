@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { useAuth } from './auth/auth.js'
+import BottomNav from './components/BottomNav.jsx'
 import Footer from './components/Footer.jsx'
 import Header from './components/Header.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
@@ -14,7 +15,7 @@ function RequireLogin({ children }) {
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pb-16 sm:pb-0">
       <Header />
       <main className="flex-1">
         <Routes>
@@ -33,6 +34,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <BottomNav />
     </div>
   )
 }

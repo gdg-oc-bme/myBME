@@ -3,16 +3,19 @@ import { Link } from 'react-router'
 import heroImage from '../assets/campus-k-building-dusk.webp'
 import { useAuth } from '../auth/auth.js'
 import PlaceList from '../components/PlaceList.jsx'
+import { buildingInfo } from '../data/buildings.js'
 import { guides } from '../data/guides.js'
-import { quickLinks } from '../data/links.js'
+import { quickLinks, suggestPlaceUrl } from '../data/links.js'
 import { categories, places } from '../data/places.js'
 
 const suggestions = ['Printing', 'Library', 'ETK', 'Building Q']
 
 const buildings = [...new Set(places.map((p) => p.building))].map((id) => ({
   id,
-  label: id === 'Library' ? 'Lib' : id,
-  name: id === 'Library' ? 'Central Library' : `${id} building`,
+  label: id,
+  name: `${id} building`,
+  description: '',
+  ...buildingInfo[id],
   count: places.filter((p) => p.building === id).length,
 }))
 
@@ -113,13 +116,16 @@ export default function HomePage() {
                 type="button"
                 aria-pressed={selected}
                 onClick={() => setBuilding(selected ? null : b.id)}
-                className={`min-w-28 shrink-0 rounded-2xl px-5 py-4 text-left transition-colors ${
+                className={`w-40 shrink-0 rounded-2xl px-5 py-4 text-left transition-colors ${
                   selected ? 'bg-bme-red text-white' : 'bg-white hover:bg-bme-red-50'
                 }`}
               >
                 <span className={`block font-display text-4xl font-extrabold ${selected ? '' : 'text-bme-red'}`}>
                   {b.label}
                 </span>
+                {b.description && (
+                  <span className="mt-1 block text-sm font-medium leading-snug">{b.description}</span>
+                )}
                 <span className={`mt-1 block text-xs ${selected ? 'text-white/80' : 'text-ink-soft'}`}>
                   {b.count} {b.count === 1 ? 'place' : 'places'}
                 </span>
@@ -213,6 +219,29 @@ export default function HomePage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="mt-16 flex flex-col gap-4 rounded-2xl border border-dashed border-ink/20 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-display text-xl font-bold">Something missing?</h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            Know a printer, café or study spot that isn’t listed, or hours that are wrong? Tell us and we’ll check it.
+          </p>
+        </div>
+        {suggestPlaceUrl ? (
+          <a
+            href={suggestPlaceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="shrink-0 rounded-full bg-ink px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-bme-red"
+          >
+            Suggest a place
+          </a>
+        ) : (
+          <span className="shrink-0 rounded-full bg-paper px-5 py-2.5 text-center text-sm font-medium text-ink-soft">
+            Suggestions open soon
+          </span>
+        )}
       </section>
     </div>
   )

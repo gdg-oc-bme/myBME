@@ -15,7 +15,8 @@ npm run lint     # oxlint
 ```
 
 The backend URL defaults to `http://localhost:8000`. To change it, copy `.env.example`
-to `.env.local` and set `VITE_BACKEND_URL`.
+to `.env.local` and set `VITE_BACKEND_URL`. Set `VITE_SUGGEST_PLACE_URL` (e.g. a Google
+Form) to enable the "Suggest a place" button; without it the page says "Suggestions open soon".
 
 ## Backend connection
 
