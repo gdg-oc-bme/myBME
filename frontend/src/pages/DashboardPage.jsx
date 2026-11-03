@@ -1,94 +1,170 @@
-import { quickLinks } from '../data/links.js'
+import { useEffect, useState } from 'react'
+import { apiGet } from '../api/client.js'
 import { useAuth } from '../auth/auth.js'
-import QuickLinks from '../components/QuickLinks.jsx'
-import Section from '../components/Section.jsx'
+import { sampleCourses, sampleToday } from '../data/sampleTimetable.js'
 
-function Card({ title, children }) {
+// Same shape as GET /api/dashboard/, used when signed in with the dev-only demo account.
+const demoServices = [
+  { name: 'Moodle', url: '', sso: true },
+  { name: 'Neptun', url: 'https://kth.bme.hu/ext/frame/info.html', sso: false },
+]
+
+function useLinkedServices(isDemo) {
+  const [state, setState] = useState(
+    isDemo ? { status: 'ready', services: demoServices } : { status: 'loading', services: [] },
+  )
+
+  useEffect(() => {
+    if (isDemo) return
+    let cancelled = false
+    apiGet('/api/dashboard/')
+      .then((data) => {
+        if (!cancelled) setState({ status: 'ready', services: data.services })
+      })
+      .catch(() => {
+        if (!cancelled) setState({ status: 'error', services: [] })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [isDemo])
+
+  return state
+}
+
+function Panel({ title, sample, children }) {
   return (
-    <div className="rounded-lg border border-line bg-white p-5">
-      <h2 className="font-serif text-lg font-bold">{title}</h2>
-      <div className="mt-3">{children}</div>
-    </div>
+    <section className="rounded-2xl bg-white p-5">
+      <h2 className="font-display text-xl font-bold">
+        {title}
+        {sample && (
+          <span className="ml-2 rounded-full bg-cream px-2 py-0.5 align-middle font-sans text-xs font-medium text-ink-soft">
+            sample data
+          </span>
+        )}
+      </h2>
+      <div className="mt-4">{children}</div>
+    </section>
   )
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth()
-  const initials = user.name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
+  const { status, user } = useAuth()
+  const services = useLinkedServices(status === 'demo')
+  const [now] = useState(() => new Date())
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username
+  const today = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-10">
-      <div className="flex items-center gap-4">
-        <span className="grid place-items-center size-14 rounded-full bg-bme-red text-white text-lg font-bold">
-          {initials}
-        </span>
-        <div>
-          <h1 className="font-serif text-2xl font-bold">Welcome, {user.name.split(' ')[0]}</h1>
-          <p className="text-sm text-ink-soft">
-            {user.programme} · {user.semester}
-          </p>
-        </div>
-        <span className="ml-auto rounded bg-amber-50 px-2 py-1 text-xs text-amber-800 ring-1 ring-amber-600/20">
-          Demo data
-        </span>
-      </div>
+    <div className="mx-auto max-w-6xl px-4">
+      <section className="mt-10">
+        <p className="text-sm font-medium text-ink-soft">
+          <span className="mr-2 inline-block size-2 rounded-full bg-bme-red align-middle" aria-hidden="true" />
+          {today}
+        </p>
+        <h1 className="mt-3 font-display text-5xl font-extrabold tracking-tight">
+          Hi, <span className="text-bme-red">{user.first_name || fullName}</span>.
+        </h1>
+        <p className="mt-2 text-ink-soft">
+          You have {sampleToday.length} classes today. The first starts at {sampleToday[0].time}.
+        </p>
+      </section>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <div className="md:col-span-2">
-          <Card title="Today">
-            <ul className="divide-y divide-line">
-              {user.today.map((item) => (
-                <li key={item.time} className="flex gap-4 py-3 text-sm">
-                  <span className="w-24 shrink-0 font-medium tabular-nums">{item.time}</span>
-                  <span>
-                    <span className="font-medium">{item.course}</span>
-                    <span className="text-ink-soft"> · {item.type}</span>
-                    <span className="block text-ink-soft">{item.room}</span>
-                  </span>
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">
+        <div className="space-y-6">
+          <Panel title="Today" sample>
+            <ol className="relative ml-2 border-l-2 border-bme-red-50">
+              {sampleToday.map((item) => (
+                <li key={item.time} className="relative pb-6 pl-6 last:pb-0">
+                  <span
+                    className="absolute -left-[7px] top-1.5 size-3 rounded-full bg-bme-red ring-4 ring-white"
+                    aria-hidden="true"
+                  />
+                  <p className="text-sm font-semibold tabular-nums text-bme-red">
+                    {item.time}–{item.end}
+                  </p>
+                  <p className="mt-0.5 font-semibold">{item.course}</p>
+                  <p className="text-sm text-ink-soft">
+                    {item.type} · {item.room}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </Panel>
+
+          <Panel title="This semester" sample>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {sampleCourses.map((course) => (
+                <li key={course.code} className="rounded-xl bg-cream px-4 py-3">
+                  <p className="font-semibold">{course.name}</p>
+                  <p className="text-sm text-ink-soft">
+                    {course.code} · {course.credits} credits
+                  </p>
                 </li>
               ))}
             </ul>
-          </Card>
+          </Panel>
         </div>
 
-        <Card title="Profile">
-          <dl className="space-y-2 text-sm">
-            <div>
-              <dt className="text-ink-soft">Neptun code</dt>
-              <dd className="font-medium">{user.neptun}</dd>
-            </div>
-            <div>
-              <dt className="text-ink-soft">E-mail</dt>
-              <dd className="font-medium break-all">{user.email}</dd>
-            </div>
-            <div>
-              <dt className="text-ink-soft">Faculty</dt>
-              <dd className="font-medium">{user.faculty}</dd>
-            </div>
-          </dl>
-        </Card>
+        <div className="space-y-6">
+          <Panel title="Your services">
+            {services.status === 'loading' && <p className="text-sm text-ink-soft">Loading…</p>}
+            {services.status === 'error' && (
+              <p className="text-sm text-ink-soft">Couldn’t load your services right now.</p>
+            )}
+            {services.status === 'ready' && (
+              <ul className="space-y-2">
+                {services.services.map((s) => {
+                  const body = (
+                    <>
+                      <span>
+                        <span className="block font-semibold">{s.name}</span>
+                        <span className="block text-xs text-ink-soft">
+                          {s.sso ? 'Signs you in automatically' : 'Separate login'}
+                        </span>
+                      </span>
+                      {s.url && <span aria-hidden="true">→</span>}
+                    </>
+                  )
+                  return (
+                    <li key={s.name}>
+                      {s.url ? (
+                        <a
+                          href={s.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-between rounded-xl bg-cream px-4 py-3 hover:bg-bme-red-50 hover:text-bme-red"
+                        >
+                          {body}
+                        </a>
+                      ) : (
+                        <div className="flex items-center justify-between rounded-xl bg-cream px-4 py-3 text-ink-soft">
+                          {body}
+                        </div>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </Panel>
+
+          <Panel title="Profile">
+            <dl className="space-y-3 text-sm">
+              {[
+                ['Name', fullName],
+                ['E-mail', user.email],
+                ['eduID', user.username],
+              ].map(([label, value]) => (
+                <div key={label}>
+                  <dt className="text-ink-soft">{label}</dt>
+                  <dd className="font-medium break-all">{value || '—'}</dd>
+                </div>
+              ))}
+            </dl>
+          </Panel>
+        </div>
       </div>
-
-      <Section title="My courses this semester">
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {user.courses.map((course) => (
-            <li key={course.code} className="rounded-lg border border-line bg-white p-4">
-              <p className="text-xs font-semibold text-bme-red">{course.code}</p>
-              <p className="mt-1 font-medium">{course.name}</p>
-              <p className="mt-1 text-sm text-ink-soft">
-                {course.credits} credits · {course.room}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section title="Quick links">
-        <QuickLinks links={quickLinks.slice(0, 4)} />
-      </Section>
     </div>
   )
 }

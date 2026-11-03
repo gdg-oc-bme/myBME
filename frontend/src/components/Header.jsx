@@ -1,50 +1,47 @@
-import { LogOut } from 'lucide-react'
 import { Link, NavLink } from 'react-router'
 import { useAuth } from '../auth/auth.js'
 
 const navClass = ({ isActive }) =>
-  `px-3 py-2 rounded text-sm font-medium transition-colors ${
-    isActive ? 'text-bme-red' : 'text-ink-soft hover:text-bme-red'
+  `rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+    isActive ? 'bg-ink text-white' : 'text-ink-soft hover:text-ink'
   }`
 
 export default function Header() {
-  const { user, logout } = useAuth()
+  const { status, user, logout } = useAuth()
 
   return (
-    <header className="bg-white border-b border-line">
-      <div className="h-1 bg-bme-red" />
-      <div className="mx-auto max-w-5xl px-4 h-16 flex items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2" aria-label="myBME home">
-          <span className="font-serif text-2xl font-bold">my</span>
-          <span className="font-serif text-lg font-bold bg-bme-red text-white px-2 py-0.5 rounded">BME</span>
+    <header className="mx-auto w-full max-w-6xl px-4 pt-5">
+      <div className="flex items-center justify-between gap-4 rounded-2xl bg-white px-4 py-3 shadow-[0_1px_0_var(--color-line)]">
+        <Link to="/" className="font-display text-2xl font-extrabold tracking-tight" aria-label="myBME home">
+          <span className="text-bme-red">my</span>BME
         </Link>
 
-        <nav aria-label="Main" className="flex items-center gap-1">
+        <nav aria-label="Main" className="hidden items-center gap-2 sm:flex">
           <NavLink to="/" end className={navClass}>
             Campus
           </NavLink>
-          {user ? (
-            <>
-              <NavLink to="/dashboard" className={navClass}>
-                My dashboard
-              </NavLink>
+          {user && (
+            <NavLink to="/dashboard" className={navClass}>
+              My day
+            </NavLink>
+          )}
+          {status !== 'loading' &&
+            (user ? (
               <button
                 type="button"
                 onClick={logout}
-                className="ml-1 inline-flex items-center gap-1.5 rounded px-3 py-2 text-sm text-ink-soft hover:text-bme-red"
+                className="ml-1 rounded-full px-3 py-1.5 text-sm text-ink-soft hover:text-bme-red"
               >
-                <LogOut className="size-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Sign out</span>
+                Sign out
               </button>
-            </>
-          ) : (
-            <Link
-              to="/login"
-              className="ml-1 rounded-md bg-bme-red px-4 py-2 text-sm font-semibold text-white hover:bg-bme-red-dark"
-            >
-              Sign in
-            </Link>
-          )}
+            ) : (
+              <Link
+                to="/login"
+                className="ml-1 rounded-full bg-bme-red px-4 py-1.5 text-sm font-semibold text-white hover:bg-bme-red-dark"
+              >
+                Sign in
+              </Link>
+            ))}
         </nav>
       </div>
     </header>

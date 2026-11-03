@@ -2,27 +2,23 @@ import { openStatus, todayHoursLabel } from '../utils/hours.js'
 import StatusBadge from './StatusBadge.jsx'
 
 export default function PlaceList({ places }) {
-  if (places.length === 0) return <p className="text-ink-soft">No places match your search.</p>
+  if (places.length === 0) return <p className="px-5 py-8 text-ink-soft">Nothing matches – try another search.</p>
 
   return (
-    <ul className="divide-y divide-line rounded-lg border border-line bg-white">
+    <ul className="divide-y divide-line">
       {places.map((place) => (
-        <li key={place.id} className="flex items-center gap-4 p-4">
-          <span
-            className="grid place-items-center size-10 shrink-0 rounded-md bg-ink text-white text-xs font-bold"
-            title="Building"
-          >
-            {place.building.length > 2 ? place.building.slice(0, 3) : place.building}
-          </span>
+        <li key={place.id} className="flex items-start gap-4 px-5 py-4">
           <div className="min-w-0 flex-1">
-            <p className="font-medium">
+            <p className="font-semibold">
               {place.name}
               {!place.verified && <span className="ml-2 text-xs font-normal text-ink-soft">(sample)</span>}
             </p>
-            <p className="text-sm text-ink-soft truncate">{place.location}</p>
+            <p className="text-sm text-ink-soft">{place.location}</p>
           </div>
-          <div className="hidden sm:block text-right text-sm text-ink-soft">{todayHoursLabel(place)}</div>
-          <StatusBadge status={openStatus(place)} />
+          <div className="flex flex-col items-end gap-1 text-right">
+            <StatusBadge status={openStatus(place)} />
+            <p className="text-xs text-ink-soft max-w-48">{todayHoursLabel(place)}</p>
+          </div>
         </li>
       ))}
     </ul>

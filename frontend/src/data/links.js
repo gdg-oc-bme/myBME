@@ -1,5 +1,10 @@
 // Official BME web services. Every URL here was checked against the live
 // site (October 2026). Keep this list to official sources only.
+// Hard-coded for now: these will move to their own table in the backend.
+
+// Where students can suggest a missing place (e.g. a Google Form the team owns).
+// Leave unset until that form exists; the page then says the feature is coming soon.
+export const suggestPlaceUrl = import.meta.env.VITE_SUGGEST_PLACE_URL ?? ''
 export const quickLinks = [
   {
     id: 'neptun',

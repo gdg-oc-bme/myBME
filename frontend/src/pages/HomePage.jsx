@@ -1,81 +1,248 @@
-import { Search } from 'lucide-react'
 import { useState } from 'react'
-import Icon from '../components/Icon.jsx'
+import { Link } from 'react-router'
+import heroImage from '../assets/campus-k-building-dusk.webp'
+import { useAuth } from '../auth/auth.js'
 import PlaceList from '../components/PlaceList.jsx'
-import QuickLinks from '../components/QuickLinks.jsx'
-import Section from '../components/Section.jsx'
-import { quickLinks } from '../data/links.js'
+import { buildingInfo } from '../data/buildings.js'
+import { guides } from '../data/guides.js'
+import { quickLinks, suggestPlaceUrl } from '../data/links.js'
 import { categories, places } from '../data/places.js'
+
+const suggestions = ['Printing', 'Library', 'ETK', 'Building Q']
+
+const buildings = [...new Set(places.map((p) => p.building))].map((id) => ({
+  id,
+  label: id,
+  name: `${id} building`,
+  description: '',
+  ...buildingInfo[id],
+  count: places.filter((p) => p.building === id).length,
+}))
 
 const matches = (query, ...fields) => {
   const q = query.trim().toLowerCase()
   return !q || fields.some((f) => f?.toLowerCase().includes(q))
 }
 
+function Panel({ title, action, children, className = '' }) {
+  return (
+    <section className={`rounded-2xl bg-white ${className}`}>
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-3">
+        <h2 className="font-display text-xl font-bold">{title}</h2>
+        {action}
+      </div>
+      {children}
+    </section>
+  )
+}
+
 export default function HomePage() {
+  const { user } = useAuth()
+  const [now] = useState(() => new Date())
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
+  const [building, setBuilding] = useState(null)
 
   const visibleLinks = quickLinks.filter((l) => matches(query, l.title, l.description))
   const visiblePlaces = places.filter(
     (p) =>
       (category === 'all' || p.category === category) &&
+      (!building || p.building === building) &&
       matches(query, p.name, p.description, p.location, `building ${p.building}`),
   )
 
-  return (
-    <div className="mx-auto max-w-5xl px-4">
-      <section className="pt-12">
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold">Everything on campus, in one place.</h1>
-        <p className="mt-2 text-ink-soft">Offices, printing, library and study spaces for every BME student.</p>
+  const today = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
 
-        <div className="mt-6 relative max-w-xl">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-ink-soft" aria-hidden="true" />
-          <label htmlFor="search" className="sr-only">
-            Search
-          </label>
-          <input
-            id="search"
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search e.g. “print”, “library”, “building Q”"
-            className="w-full rounded-lg border border-line bg-white pl-10 pr-4 py-3 focus:border-bme-red focus:outline-none focus:ring-2 focus:ring-bme-red/20"
+  return (
+    <div className="mx-auto max-w-6xl px-4">
+      <section className="mt-10 grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+        <div>
+          <p className="text-sm font-medium text-ink-soft">
+            <span className="mr-2 inline-block size-2 rounded-full bg-bme-red align-middle" aria-hidden="true" />
+            {today}
+          </p>
+          <h1 className="mt-4 font-display text-5xl sm:text-6xl font-extrabold leading-[0.95] tracking-tight">
+            What do you need on campus <span className="text-bme-red">today?</span>
+          </h1>
+
+          <div className="mt-8">
+            <label htmlFor="search" className="sr-only">
+              Search services and places
+            </label>
+            <input
+              id="search"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search printing, offices, buildings…"
+              className="w-full rounded-full border border-line bg-white px-6 py-4 text-lg placeholder:text-ink-soft/60 focus:border-bme-red focus:outline-none focus:ring-4 focus:ring-bme-red/15"
+            />
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+              <span className="text-ink-soft">Try:</span>
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setQuery(s)}
+                  className="rounded-full border border-line bg-white px-3 py-1 hover:border-bme-red hover:text-bme-red"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <figure className="relative">
+          <img
+            src={heroImage}
+            alt="The K building of BME on the Danube bank at dusk"
+            className="aspect-[4/3] w-full rounded-3xl object-cover object-[55%_40%]"
           />
+          <figcaption className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-medium backdrop-blur">
+            K building · Műegyetem rakpart 3
+          </figcaption>
+        </figure>
+      </section>
+
+      <section className="mt-16">
+        <h2 className="font-display text-xl font-bold">Browse by building</h2>
+        <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+          {buildings.map((b) => {
+            const selected = building === b.id
+            return (
+              <button
+                key={b.id}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setBuilding(selected ? null : b.id)}
+                className={`w-40 shrink-0 rounded-2xl px-5 py-4 text-left transition-colors ${
+                  selected ? 'bg-bme-red text-white' : 'bg-white hover:bg-bme-red-50'
+                }`}
+              >
+                <span className={`block font-display text-4xl font-extrabold ${selected ? '' : 'text-bme-red'}`}>
+                  {b.label}
+                </span>
+                {b.description && (
+                  <span className="mt-1 block text-sm font-medium leading-snug">{b.description}</span>
+                )}
+                <span className={`mt-1 block text-xs ${selected ? 'text-white/80' : 'text-ink-soft'}`}>
+                  {b.count} {b.count === 1 ? 'place' : 'places'}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </section>
 
-      <Section title="Quick links">
-        <QuickLinks links={visibleLinks} />
-      </Section>
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">
+        <Panel
+          title={building ? buildings.find((b) => b.id === building).name : 'Places on campus'}
+          action={
+            <div role="group" aria-label="Filter by category" className="flex flex-wrap gap-1.5 text-sm">
+              {[{ id: 'all', label: 'All' }, ...categories].map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  aria-pressed={category === c.id}
+                  onClick={() => setCategory(c.id)}
+                  className={`rounded-full px-3 py-1 ${
+                    category === c.id ? 'bg-ink text-white' : 'bg-cream text-ink-soft hover:text-ink'
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          }
+        >
+          <PlaceList places={visiblePlaces} />
+        </Panel>
 
-      <Section
-        title="Places"
-        action={
-          <select
-            aria-label="Filter by category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="rounded-md border border-line bg-white px-3 py-1.5 text-sm"
-          >
-            <option value="all">All categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-        }
-      >
-        <PlaceList places={visiblePlaces} />
-      </Section>
+        <div className="space-y-6">
+          <Panel title="Quick links">
+            {visibleLinks.length === 0 ? (
+              <p className="px-5 pb-5 text-sm text-ink-soft">No links match.</p>
+            ) : (
+              <ul className="divide-y divide-line pb-2">
+                {visibleLinks.map((link) => (
+                  <li key={link.id}>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group flex items-center justify-between gap-3 px-5 py-3"
+                    >
+                      <span>
+                        <span className="block font-semibold group-hover:text-bme-red">{link.title}</span>
+                        <span className="block text-xs text-ink-soft">{link.description}</span>
+                      </span>
+                      <span aria-hidden="true" className="text-ink-soft group-hover:text-bme-red">
+                        →
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
 
-      <div className="mt-10 rounded-lg border border-dashed border-ink/20 p-5 flex items-center gap-4">
-        <Icon name="graduation" className="size-6 text-bme-red shrink-0" />
-        <p className="text-sm text-ink-soft">
-          Sign in with your BME eduID to see your courses, timetable and personal dashboard.
-        </p>
+          {!user && (
+            <section className="rounded-2xl bg-bme-red p-6 text-white">
+              <h2 className="font-display text-2xl font-bold leading-tight">Your classes, in the same place.</h2>
+              <p className="mt-2 text-sm text-white/85">Sign in with your BME eduID to see your day.</p>
+              <Link
+                to="/login"
+                className="mt-4 inline-block rounded-full bg-white px-4 py-2 text-sm font-semibold text-bme-red hover:bg-cream"
+              >
+                Sign in
+              </Link>
+            </section>
+          )}
+        </div>
       </div>
+
+      <section className="mt-16">
+        <h2 className="font-display text-3xl font-extrabold tracking-tight">New to BME? Start here.</h2>
+        <ol className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {guides.map((guide, i) => (
+            <li key={guide.id}>
+              <a href={guide.url} target="_blank" rel="noreferrer" className="group block">
+                <span className="font-display text-5xl font-extrabold text-bme-red/25 group-hover:text-bme-red">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="mt-2 block font-semibold group-hover:underline underline-offset-4">
+                  {guide.title}
+                </span>
+                <span className="mt-1 block text-sm text-ink-soft">{guide.description}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="mt-16 flex flex-col gap-4 rounded-2xl border border-dashed border-ink/20 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-display text-xl font-bold">Something missing?</h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            Know a printer, café or study spot that isn’t listed, or hours that are wrong? Tell us and we’ll check it.
+          </p>
+        </div>
+        {suggestPlaceUrl ? (
+          <a
+            href={suggestPlaceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="shrink-0 rounded-full bg-ink px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-bme-red"
+          >
+            Suggest a place
+          </a>
+        ) : (
+          <span className="shrink-0 rounded-full bg-paper px-5 py-2.5 text-center text-sm font-medium text-ink-soft">
+            Suggestions open soon
+          </span>
+        )}
+      </section>
     </div>
   )
 }
