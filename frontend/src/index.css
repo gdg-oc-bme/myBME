@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 /*
- * BME brand tokens, taken from the official bme.hu stylesheet
- * (themes/custom/bme_bootstrap). Keep these in sync with the university site.
+ * BME red comes from the official bme.hu stylesheet. The rest of the palette
+ * (warm cream background, display font) is myBME's own, so the app doesn't
+ * look like a copy of the university site.
  */
 @theme {
   --color-bme-red: #931634;
@@ -10,20 +11,17 @@
   --color-bme-red-50: #f9eef1;
   --color-ink: #262626;
   --color-ink-soft: #5c5c5c;
-  --color-line: #e6e9eb;
+  --color-line: #e7e1d8;
+  --color-cream: #f7f4ef;
   --color-paper: #f1f1f1;
 
   --font-sans: "Noto Sans", system-ui, sans-serif;
-  --font-serif: "Noto Serif", Georgia, serif;
+  --font-display: "Bricolage Grotesque", "Noto Sans", system-ui, sans-serif;
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
-    @apply bg-white text-ink font-sans antialiased;
+    @apply bg-cream text-ink font-sans antialiased;
   }
 
   :focus-visible {

@@ -27,7 +27,8 @@ to `.env.local` and set `VITE_BACKEND_URL`.
 - **All API calls** go through `apiGet()` in `src/api/client.js`, which sends the session
   cookie (`credentials: 'include'`). Use it for every new endpoint.
 - If the backend isn't running, the sign-in page says so and (in `npm run dev` only)
-  offers a demo account so the dashboard can still be shown.
+  offers a demo account so the dashboard can still be shown. The demo session survives
+  page reloads (sessionStorage, dev only); real sessions never use browser storage.
 
 ## Structure
 
@@ -56,17 +57,18 @@ Most content still lives in `src/data/` and will move to the backend as endpoint
 
 ## Branding
 
-Colours and fonts follow the official bme.hu site:
+BME red comes from the official bme.hu site. The rest is myBME's own look, so the app
+doesn't copy the university site:
 
-| Token           | Value     | Use                       |
-| --------------- | --------- | ------------------------- |
-| `bme-red`       | `#931634` | Primary brand colour      |
-| `bme-red-dark`  | `#76122A` | Hover / pressed           |
-| `ink`           | `#262626` | Body text                 |
-| `line`          | `#E6E9EB` | Borders                   |
-| `paper`         | `#F1F1F1` | Light background          |
+| Token           | Value     | Use                          |
+| --------------- | --------- | ---------------------------- |
+| `bme-red`       | `#931634` | Primary brand colour         |
+| `bme-red-dark`  | `#76122A` | Hover / pressed              |
+| `ink`           | `#262626` | Body text                    |
+| `cream`         | `#F7F4EF` | Page background              |
+| `line`          | `#E7E1D8` | Dividers                     |
 
-Headings use **Noto Serif**, body text uses **Noto Sans**.
+Headings use **Bricolage Grotesque** (`font-display`), body text uses **Noto Sans**.
 
 Photos are by Dennis G. Jarvis, licensed
 [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/), via Wikimedia Commons
