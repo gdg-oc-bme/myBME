@@ -1,6 +1,6 @@
-// Campus places shown on the dashboard.
+// Campus places shown on the home page.
 //
-// The backend team will replace this file with an API later; the shape below
+// Hard-coded for now: this will be replaced by a backend API; the shape below
 // is what the UI expects:
 //   hours    – { mon..sun: ['HH:MM', 'HH:MM'] } (missing day = closed),
 //              or null when the hours change often (see hoursNote)
