@@ -1,6 +1,0 @@
-pyproject.toml
-myBME.egg-info/PKG-INFO
-myBME.egg-info/SOURCES.txt
-myBME.egg-info/dependency_links.txt
-myBME.egg-info/requires.txt
-myBME.egg-info/top_level.txt
