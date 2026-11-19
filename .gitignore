@@ -22,3 +22,6 @@ frontend/.env
 .DS_Store
 .vscode/
 .idea/
+
+# local state notes
+STATE.md
